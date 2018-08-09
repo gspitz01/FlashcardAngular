@@ -1,0 +1,4 @@
+<h2>Category</h2>
+<ul>
+  <li *ngFor="let flashcard of flashcards | async">{{flashcard.front}} - {{flashcard.back}}</li>
+</ul>

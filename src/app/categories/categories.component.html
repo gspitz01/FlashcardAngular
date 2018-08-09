@@ -1,0 +1,9 @@
+<h2>Categories</h2>
+<form (ngSubmit)="onSubmit()">
+  <label for="name">Name:</label>
+  <input type="text" placeholder="Enter name..." id="name" required [(ngModel)]="categoryName" name="category">
+  <button type="submit">Submit</button>
+</form>
+<ul>
+  <li *ngFor="let category of categories | async" routerLink="{{category.key}}">{{category.name}}: {{category.count}}</li>
+</ul>
