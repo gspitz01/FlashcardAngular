@@ -1,0 +1,5 @@
+<div *ngIf="!loggedIn()"><span class="login-interaction" routerLink="/login">Login</span></div>
+<div *ngIf="loggedIn()">
+  <span>{{currentUser()}}</span>
+  <span class="login-interaction" (click)="logout()">Logout</span>
+</div>
