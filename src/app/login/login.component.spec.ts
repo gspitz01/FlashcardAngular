@@ -1,6 +1,35 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { LoginComponent } from './login.component';
+import { SecurityService } from '../security.service';
+
+const fakeActivatedRoute = {
+  snapshot: {
+    data: {
+      
+    },
+    paramMap: {
+      get: (param: string) => {
+        return "0";
+      }
+    }
+  },
+  queryParams: {
+    subscribe: (func) => {
+      
+    }
+  }
+} as ActivatedRoute;
+
+const securityServiceMock = {
+  
+} as SecurityService;
+
+const routerMock = {
+  
+} as Router;
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -8,7 +37,17 @@ describe('LoginComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LoginComponent ]
+      declarations: [
+        LoginComponent
+      ],
+      providers: [
+        { provide: ActivatedRoute, useValue: fakeActivatedRoute },
+        { provide: SecurityService, useValue: securityServiceMock },
+        { provide: Router, useValue: routerMock }
+      ],
+      schemas: [
+        NO_ERRORS_SCHEMA
+      ]
     })
     .compileComponents();
   }));
