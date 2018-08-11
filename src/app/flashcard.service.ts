@@ -53,4 +53,8 @@ export class FlashcardService {
   getFlashcards(): Observable<Flashcard[]> {
     return this.flashcards;
   }
+  
+  createCategory(name: string) {
+    
+  }
 }

@@ -21,6 +21,7 @@ export class CategoriesComponent implements OnInit {
   }
   
   onSubmit() {
+    this.flashcardService.createCategory(this.categoryName);
     this.categoryName = "";
   }
 
