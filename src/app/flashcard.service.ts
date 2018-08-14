@@ -25,7 +25,7 @@ export class FlashcardService {
   private categories: Observable<any[]>;
   private flashcards: Observable<any[]>;
 
-  constructor(private db: AngularFireDatabase) { 
+  constructor(public db: AngularFireDatabase) { 
     this.categories = this.db.list('categories').snapshotChanges().pipe(
       map(changes => 
         changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
