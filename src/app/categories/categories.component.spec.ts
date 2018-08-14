@@ -21,14 +21,11 @@ const flashcardServiceMock = {
   }
 } as FlashcardService;
 
-const mockComponent = {
-  
-} as Component;
+class ComponentMock extends Component {}
 
 describe('CategoriesComponent', () => {
   let component: CategoriesComponent;
   let fixture: ComponentFixture<CategoriesComponent>;
-  let router: Router;
   let location: Location;
   let service: FlashcardService;
   let submitButton: DebugElement;
@@ -40,9 +37,9 @@ describe('CategoriesComponent', () => {
       declarations: [ CategoriesComponent ],
       imports: [
         FormsModule,
-        RouterTestingModule.withRoutes(
-          [{ path: 'key', component: mockComponent }]
-        )
+        RouterTestingModule.withRoutes([
+          { path: "key", component: ComponentMock }
+        ])
       ],
       providers: [
         { provide: FlashcardService, useValue: flashcardServiceMock }
@@ -54,7 +51,6 @@ describe('CategoriesComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(CategoriesComponent);
-    router = TestBed.get(Router);
     location = TestBed.get(Location);
     component = fixture.componentInstance;
     service = TestBed.get(FlashcardService);
