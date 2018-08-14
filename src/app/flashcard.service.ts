@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { Observable, of } from 'rxjs';
 import { map, flatMap } from 'rxjs/operators';
 
@@ -24,15 +24,19 @@ const FLASHCARDS: Flashcard[] = [
 export class FlashcardService {
   private categories: Observable<any[]>;
   private flashcards: Observable<any[]>;
+  private categoriesRef: AngularFireList<any>;
+  private flashcardsRef: AngularFireList<any>;
 
-  constructor(public db: AngularFireDatabase) { 
-    this.categories = this.db.list('categories').snapshotChanges().pipe(
-      map(changes => 
+  constructor(private db: AngularFireDatabase) {
+    this.categoriesRef = this.db.list('categories');
+    this.flashcardsRef = this.db.list('flashcards');
+    this.categories = this.categoriesRef.snapshotChanges().pipe(
+      map(changes =>
         changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
       )
     );
-    this.flashcards = this.db.list('flashcards').snapshotChanges().pipe(
-      map(changes => 
+    this.flashcards = this.flashcardsRef.snapshotChanges().pipe(
+      map(changes =>
         changes.map(c => ({ key: c.payload.key, ...c.payload.val() }))
       )
     );
@@ -55,6 +59,44 @@ export class FlashcardService {
   }
   
   createCategory(name: string) {
+    this.categoriesRef.push({name: name, count: 0});
+  }
+  
+  createFlashcard(flashcard: Flashcard, category: Category) {
+    this.flashcardsRef.push({
+      front: flashcard.front,
+      back: flashcard.back,
+      category_name: category.name,
+      category_id: category.key
+    });
+    this.db.object('/categories/' + category.key)
+      .update({count: category.count + 1});
+  }
+  
+  deleteCategory(categoryKey: string) {
+    // Remove category locally
+    this.categories = this.categories.pipe(
+      map(categories => categories.filter(category => category.key !== categoryKey))
+    );
+    // Remove flashcards locally
+    this.flashcards = this.flashcards.pipe(
+      map(flashcards => flashcards.filter(flashcard => flashcard.category_id !== categoryKey))
+    );
     
+    // Remove category from remote database
+    this.db.object('/categories/' + categoryKey).remove();
+    
+    // Remove flashcards in that category from remote database
+    this.getCategory(categoryKey).subscribe((flashcards) => {
+      flashcards.forEach((flashcard) => {
+        this.deleteFlashcard(flashcard.key);
+      });
+    });
+  }
+  
+  deleteFlashcard(flashcardKey: string, category: Category) {
+    this.db.object('/flashcards/' + flashcardKey).remove();
+    // Update category count
+    this.db.object('/categories/' + category.key).update({count: category.count - 1});
   }
 }
