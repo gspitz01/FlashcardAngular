@@ -1,4 +1,12 @@
-<h2>Category</h2>
+<h2>{{(category | async).name}}<span class="delete-category" (click)="deleteCategory()">x</span></h2>
+<p class="count">#: {{(category | async).count}}</p>
+<form (ngSubmit)="onSubmit()" #flashcardForm="ngForm">
+  <input class="front" [(ngModel)]="front" type="text" placeholder="Front" name="front" />
+  <input class="back" [(ngModel)]="back" type="text" placeholder="Back" name="back" />
+  <button type="submit">Submit</button>
+</form>
 <ul>
-  <li *ngFor="let flashcard of flashcards | async">{{flashcard.front}} - {{flashcard.back}}</li>
+  <li *ngFor="let flashcard of flashcards | async">{{flashcard.front}} - {{flashcard.back}}
+    <span class="delete-flashcard" (click)="deleteFlashcard(flashcard.key)">x</span>
+  </li>
 </ul>
