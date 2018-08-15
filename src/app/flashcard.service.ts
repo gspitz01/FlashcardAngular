@@ -43,25 +43,25 @@ export class FlashcardService {
 //    this.categories = of(CATEGORES);
 //    this.flashcards = of(FLASHCARDS);
   }
-  
+
   getCategories(): Observable<Category[]> {
     return this.categories;
   }
-  
+
   getCategory(key: string): Observable<Flashcard[]> {
     return this.flashcards.pipe(
       map(flashcards => flashcards.filter(flashcard => flashcard.category_id === key))
     );
   }
-  
+
   getFlashcards(): Observable<Flashcard[]> {
     return this.flashcards;
   }
-  
+
   createCategory(name: string) {
     this.categoriesRef.push({name: name, count: 0});
   }
-  
+
   createFlashcard(flashcard: Flashcard, category: Category) {
     this.flashcardsRef.push({
       front: flashcard.front,
@@ -72,28 +72,28 @@ export class FlashcardService {
     this.db.object('/categories/' + category.key)
       .update({count: category.count + 1});
   }
-  
-  deleteCategory(categoryKey: string) {
+
+  deleteCategory(categoryToRemove: Category) {
     // Remove category locally
     this.categories = this.categories.pipe(
-      map(categories => categories.filter(category => category.key !== categoryKey))
+      map(categories => categories.filter(category => category.key !== categoryToRemove.key))
     );
     // Remove flashcards locally
     this.flashcards = this.flashcards.pipe(
-      map(flashcards => flashcards.filter(flashcard => flashcard.category_id !== categoryKey))
+      map(flashcards => flashcards.filter(flashcard => flashcard.category_id !== categoryToRemove.key))
     );
-    
+
     // Remove category from remote database
-    this.db.object('/categories/' + categoryKey).remove();
-    
+    this.db.object('/categories/' + categoryToRemove.key).remove();
+
     // Remove flashcards in that category from remote database
-    this.getCategory(categoryKey).subscribe((flashcards) => {
+    this.getCategory(categoryToRemove.key).subscribe((flashcards) => {
       flashcards.forEach((flashcard) => {
-        this.deleteFlashcard(flashcard.key);
+        this.deleteFlashcard(flashcard.key, categoryToRemove);
       });
     });
   }
-  
+
   deleteFlashcard(flashcardKey: string, category: Category) {
     this.db.object('/flashcards/' + flashcardKey).remove();
     // Update category count
