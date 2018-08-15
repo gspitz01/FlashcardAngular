@@ -48,7 +48,13 @@ export class FlashcardService {
     return this.categories;
   }
 
-  getCategory(key: string): Observable<Flashcard[]> {
+  getCategory(key: string): Observable<Category> {
+    return this.categories.pipe(
+      map(categories => categories.filter(category => category.key === key)[0])
+    );
+  }
+
+  getCategoryFlashcards(key: string): Observable<Flashcard[]> {
     return this.flashcards.pipe(
       map(flashcards => flashcards.filter(flashcard => flashcard.category_id === key))
     );
@@ -87,7 +93,7 @@ export class FlashcardService {
     this.db.object('/categories/' + categoryToRemove.key).remove();
 
     // Remove flashcards in that category from remote database
-    this.getCategory(categoryToRemove.key).subscribe((flashcards) => {
+    this.getCategoryFlashcards(categoryToRemove.key).subscribe((flashcards) => {
       flashcards.forEach((flashcard) => {
         this.deleteFlashcard(flashcard.key, categoryToRemove);
       });

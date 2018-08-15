@@ -81,14 +81,20 @@ describe('FlashcardService', () => {
     });
   });
 
+  it('should return a single category on getCategory', () => {
+    flashcardService.getCategory(fakeCategoryKey).subscribe(category => {
+      expect(category).toBe(fakeCategory);
+    });
+  });
+
   it('should return flashcards on getFlashcards', () => {
     flashcardService.getFlashcards().subscribe((flashcards) => {
       expect(flashcards.length).toBe(2);
     });
   });
 
-  it('should filter flashcards on getCategory', () => {
-    flashcardService.getCategory(fakeCategoryKey).subscribe((flashcards) => {
+  it('should filter flashcards on getCategoryFlashcards', () => {
+    flashcardService.getCategoryFlashcards(fakeCategoryKey).subscribe((flashcards) => {
       expect(flashcards.length).toBe(1);
     });
   });
