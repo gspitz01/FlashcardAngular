@@ -12,14 +12,14 @@ import { FlashcardService } from '../flashcard.service';
 export class CategoriesComponent implements OnInit {
   categories: Observable<Category[]>;
   categoryName = "";
-  
+
   constructor(private flashcardService: FlashcardService) {
-    this.categories = flashcardService.getCategories();
   }
-  
+
   ngOnInit() {
+    this.categories = this.flashcardService.getCategories();
   }
-  
+
   onSubmit() {
     this.flashcardService.createCategory(this.categoryName);
     this.categoryName = "";

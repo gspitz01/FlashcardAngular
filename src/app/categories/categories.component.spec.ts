@@ -12,14 +12,7 @@ import { FlashcardService } from '../flashcard.service';
 import { Category } from '../category';
 
 const testCategory = new Category("name", 3, "key");
-
-const flashcardServiceMock = {
-  getCategories: () => {
-    return of([testCategory]);
-  },
-  createCategory: (name: string) => {
-  }
-} as FlashcardService;
+const fakeCategories = [testCategory];
 
 class ComponentMock extends Component {}
 
@@ -27,12 +20,15 @@ describe('CategoriesComponent', () => {
   let component: CategoriesComponent;
   let fixture: ComponentFixture<CategoriesComponent>;
   let location: Location;
-  let service: FlashcardService;
+  let flashcardService: jasmine.SpyObj<FlashcardService>;
   let submitButton: DebugElement;
   let inputField: DebugElement;
   const catName = "CatName";
 
   beforeEach(async(() => {
+    const serviceSpy = jasmine.createSpyObj("FlashcardService", ["createCategory", "getCategories"]);
+    serviceSpy.getCategories.and.returnValue(of(fakeCategories));
+
     TestBed.configureTestingModule({
       declarations: [ CategoriesComponent ],
       imports: [
@@ -42,7 +38,7 @@ describe('CategoriesComponent', () => {
         ])
       ],
       providers: [
-        { provide: FlashcardService, useValue: flashcardServiceMock }
+        { provide: FlashcardService, useValue: serviceSpy }
       ],
       schemas: [ NO_ERRORS_SCHEMA ]
     })
@@ -53,34 +49,30 @@ describe('CategoriesComponent', () => {
     fixture = TestBed.createComponent(CategoriesComponent);
     location = TestBed.get(Location);
     component = fixture.componentInstance;
-    service = TestBed.get(FlashcardService);
+    flashcardService = TestBed.get(FlashcardService);
     submitButton = fixture.debugElement.query(By.css("button"));
     inputField = fixture.debugElement.query(By.css("input"));
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should create and call getCategories on FlashcardService', () => {
     expect(component).toBeTruthy();
-  });
-  
-  it("should get categories from FlashcardService on creation", () => {
     expect(component.categories).toBeTruthy();
+    expect(flashcardService.getCategories).toHaveBeenCalled();
   });
-  
+
   it("should call createCategory on FlashcardService with categoryName onSubmit", () => {
     component.categoryName = catName;
-    spyOn(service, 'createCategory');
     component.onSubmit();
-    expect(service.createCategory).toHaveBeenCalledWith(catName);
+    expect(flashcardService.createCategory).toHaveBeenCalledWith(catName);
   });
-  
+
   it("should call createCategory on FlashcardService with categoryName on submit button click", () => {
     component.categoryName = catName;
-    spyOn(service, 'createCategory');
     submitButton.nativeElement.click();
-    expect(service.createCategory).toHaveBeenCalledWith(catName);
+    expect(flashcardService.createCategory).toHaveBeenCalledWith(catName);
   });
-  
+
   it ("should change categoryName on input to text field", async(() => {
     fixture.whenStable().then(() => {
       inputField.nativeElement.value = catName;
@@ -88,7 +80,7 @@ describe('CategoriesComponent', () => {
       expect(component.categoryName).toBe(catName);
     });
   }));
-  
+
   it("should change route to category of id on category click", async(() => {
     let categoryLi = fixture.debugElement.query(By.css("li"));
     categoryLi.nativeElement.click();
